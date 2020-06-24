@@ -1,0 +1,18 @@
+#p21 myonuclei workflow
+p21_myonuclei <- subset(p21_soupx, idents = c("Type IIb Myonuclei", "Type IIx Myonuclei", "Nos1+ Myonuclei", "Enah+ Myonuclei", "Myotendinous Junction", "Neuromuscular Junction", "Type IIb Myonuclei #2"))
+p21_myonuclei <- FindVariableFeatures(p21_myonuclei, selection.method = "vst", nfeatures = 2000)
+p21_myonuclei <- NormalizeData(p21_myonuclei)
+top30myonuclei <- head(VariableFeatures(p21_myonuclei), 30)
+plot1myonuclei <- VariableFeaturePlot(p21_myonuclei)
+plot2myonuclei <- LabelPoints(plot = plot1myonuclei, points = top30myonuclei, repel = TRUE)
+CombinePlots(plots = list(plot1myonuclei, plot2myonuclei))
+all.genesmyonuclei <- rownames(p21_myonuclei)
+p21_myonuclei <- ScaleData(p21_myonuclei, features = all.genesmyonuclei)
+p21_myonuclei <- RunPCA(p21_myonuclei, features = VariableFeatures(p21_myonuclei))
+p21_myonuclei <- FindNeighbors(p21_myonuclei, dims = 1:10)
+p21_myonuclei <- FindClusters(p21_myonuclei, resolution = 0.5)
+p21_myonuclei <- RunUMAP(p21_myonuclei, dims = 1:10)
+p21_myonuclei@reductions[["umap"]] <- p21_myonuclei_reductions_updated
+p21_myonuclei <- RenameIdents(p21_myonuclei, "1" = "Type IIx Myonuclei", "0" = "Type IIb Myonuclei", "2" = "Transient State B", "3" = "Transient State A", "4" = "Type IIb-like", "5" = "Type IIx-like", "6" = "Type IIb #2", "7" = "Meg3+ Myonuclei", "8" = "Neuromuscular Junction", "9" = "Myotendinous Junction")
+DimPlot(p21_myonuclei, reduction = "umap", label = TRUE)
+VlnPlot(p21_myonuclei, features = c("Nrap"), idents = c("Type IIx Myounclei", "Type IIb Myonuclei", "Transient State B", "Transient State A", "Type IIb-like", "Type IIx-like", "Type IIb #2"), pt.size = 0) + NoLegend()
